@@ -1,2 +1,3 @@
-# Synery_Chat_App
-Synergy comes in sharing scenery of your life with others! Download the app and make friends today!
+# Synery_Messaging_App
+Messenger of Synery Social Network!
+Create synergy from sharing your stories/ideas/scenery with others!
