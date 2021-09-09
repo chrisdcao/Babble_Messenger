@@ -1,2 +1,2 @@
 # Synery_Chat_App
-Let's keep in Touch, shall we?
+Synergy comes in sharing scenery of your life with others! Download the app and make friends today!
