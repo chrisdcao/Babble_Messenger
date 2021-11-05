@@ -2,10 +2,12 @@ package com.example.babblechatapp.activities;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.util.Log;
 import android.widget.Toast;
 
 import com.example.babblechatapp.R;
@@ -13,6 +15,7 @@ import com.example.babblechatapp.databinding.ActivityMainBinding;
 import com.example.babblechatapp.utilities.Constants;
 import com.example.babblechatapp.utilities.PreferenceManager;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.messaging.FirebaseMessaging;
 
@@ -27,13 +30,27 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        // Layout inflater: converting the appearance definition (.xml file) into Java View object
+        // inflate is the function that do the conversion recursively, traversing from parent down to child and convert each to sub-member of the Java View Object
+        // After conversion, child in XML will become member of the Java Object (equivalent to child)
         binding = ActivityMainBinding.inflate(getLayoutInflater());
-        setContentView(R.layout.activity_main);
+        // binding.getRoot() != R.layout.activity_main, it's the converted version to Java object, which is what we are interacting with. R.layout... is just the initial appearance file in @res, not impacted by any codes
+        // the R.layout.activity_main is still the XML design View (non-converted version of the layout and thus not having any update that's done to "binding" object)
+        setContentView(binding.getRoot());
         preferenceManager = new PreferenceManager(getApplicationContext());
         loadUserDetails();
         getToken();
+        // bind the button at the start of the program
+        setListeners();
     }
 
+    private void setListeners() {
+        binding.imageSignOut.setOnClickListener(v -> SignOut());
+    }
+
+    /**
+     * Get data from preference manager and bind the data to the interface (set text the user name and set image from image data)
+     */
     private void loadUserDetails() {
         binding.textName.setText(preferenceManager.getString(Constants.KEY_NAME));
         byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
@@ -43,7 +60,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * shorten the Toasting process
-     * @param message
+     * @param message the message we want to toast to screen
      */
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -55,7 +72,7 @@ public class MainActivity extends AppCompatActivity {
 
     /**
      * add FireCloudMessaging (FCM) Token after log in
-     * @param token
+     * @param token - the token received from firebase
      */
     private void updateToken(String token) {
         FirebaseFirestore database = FirebaseFirestore.getInstance();
@@ -65,7 +82,7 @@ public class MainActivity extends AppCompatActivity {
                 );
         documentReference.update(Constants.KEY_FCM_TOKEN, token)
                 .addOnSuccessListener(unused -> showToast("Token update successfully"))
-                .addOnFailureListener(e -> showToast("Unable to update token"));
+                .addOnFailureListener(e -> showToast("Unable to update token! Going back to Login Screen"));
     }
 
     private void SignOut() {
@@ -78,5 +95,16 @@ public class MainActivity extends AppCompatActivity {
                         preferenceManager.getString(Constants.KEY_USER_ID)
                 );
         HashMap<String, Object> updates = new HashMap<>();
+        updates.put(Constants.KEY_FCM_TOKEN, FieldValue.delete());
+        documentReference.update(updates)
+                // if delete token function is executed -> the database is updated, then:
+                //      1. Clear the current shared preferences (the preference Manager)
+                //      2. Go back to Sign In screen
+                .addOnSuccessListener(unused -> {
+                    preferenceManager.clear();
+                    startActivity(new Intent(getApplicationContext(), SignInActivity.class));
+                    finish();
+                })
+                .addOnFailureListener(e -> showToast("Unable to sign out"));
     }
 }

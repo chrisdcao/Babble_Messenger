@@ -4,6 +4,7 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
@@ -27,6 +28,7 @@ public class SignInActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         preferenceManager = new PreferenceManager(getApplicationContext());
+        // start the main screen once the sign in process is finished
         if (preferenceManager.getBoolean(Constants.KEY_IS_SIGNED_IN)) {
             Intent intent = new Intent(getApplicationContext(), MainActivity.class);
             startActivity(intent);
@@ -63,6 +65,7 @@ public class SignInActivity extends AppCompatActivity {
                         preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
                         preferenceManager.putString(Constants.KEY_USER_ID, documentSnapshot.getId());
                         preferenceManager.putString(Constants.KEY_NAME, documentSnapshot.getString(Constants.KEY_NAME));
+                        preferenceManager.putString(Constants.KEY_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
                         Intent intent = new Intent(getApplicationContext(), MainActivity.class);
                         intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                         startActivity(intent);
@@ -85,7 +88,7 @@ public class SignInActivity extends AppCompatActivity {
 
     /**
      * shorten the Toasting process
-     * @param message
+     * @param message toast message
      */
     private void showToast(String message) {
         Toast.makeText(getApplicationContext(), message, Toast.LENGTH_SHORT).show();
@@ -94,7 +97,7 @@ public class SignInActivity extends AppCompatActivity {
     /**
      * we only check the validity of the input here (not checking correct or not)
      * later we will do it in the sign in function
-     * @return
+     * @return true by default, else false if input invalid
      */
     private Boolean isValidSignInDetails() {
         if (binding.inputEmail.getText().toString().trim().isEmpty()) {
@@ -106,8 +109,7 @@ public class SignInActivity extends AppCompatActivity {
         } else if (binding.inputPassword.getText().toString().trim().isEmpty()) {
             showToast("Input Password");
             return false;
-        } else {
-            return true;
         }
+        return true;
     }
 }

@@ -20,4 +20,5 @@
     <string name="your_name">Your Name</string>
     <string name="confirm_your_password">Confirm Your Password</string>
     <string name="back_to_login">Back To Login</string>
+    <string name="select_user">Select User</string>
 </resources>
