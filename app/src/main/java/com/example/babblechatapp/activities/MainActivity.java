@@ -1,5 +1,6 @@
 package com.example.babblechatapp.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
@@ -7,13 +8,13 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
-import android.util.Log;
 import android.widget.Toast;
 
-import com.example.babblechatapp.R;
 import com.example.babblechatapp.databinding.ActivityMainBinding;
 import com.example.babblechatapp.utilities.Constants;
 import com.example.babblechatapp.utilities.PreferenceManager;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -45,14 +46,22 @@ public class MainActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-        binding.imageSignOut.setOnClickListener(v -> SignOut());
+        binding.imageSignOut.setOnClickListener(v -> signOut());
     }
 
     /**
      * Get data from preference manager and bind the data to the interface (set text the user name and set image from image data)
      */
     private void loadUserDetails() {
+        loadName();
+        loadImage();
+    }
+
+    private void loadName() {
         binding.textName.setText(preferenceManager.getString(Constants.KEY_NAME));
+    }
+
+    private void loadImage() {
         byte[] bytes = Base64.decode(preferenceManager.getString(Constants.KEY_IMAGE), Base64.DEFAULT);
         Bitmap bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.length);
         binding.imageProfile.setImageBitmap(bitmap);
@@ -75,36 +84,56 @@ public class MainActivity extends AppCompatActivity {
      * @param token - the token received from firebase
      */
     private void updateToken(String token) {
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
-        DocumentReference documentReference =
-                database.collection(Constants.KEY_COLLECTION_USERS).document(
-                        preferenceManager.getString(Constants.KEY_USER_ID)
-                );
+        FirebaseFirestore database = getDatabase();
+        DocumentReference documentReference = getDocumentReference(database);
         documentReference.update(Constants.KEY_FCM_TOKEN, token)
                 .addOnSuccessListener(unused -> showToast("Token update successfully"))
                 .addOnFailureListener(e -> showToast("Unable to update token! Going back to Login Screen"));
     }
 
-    private void SignOut() {
+    @NonNull
+    private FirebaseFirestore getDatabase() {
+        return FirebaseFirestore.getInstance();
+    }
+
+    @NonNull
+    private DocumentReference getDocumentReference(FirebaseFirestore database) {
+        return database.collection(Constants.KEY_COLLECTION_USERS).document(
+                preferenceManager.getString(Constants.KEY_USER_ID)
+        );
+    }
+
+    private void signOut() {
         showToast("Signing out...");
         // accessing current database (truy vấn database, bước này sẽ được làm ở mọi chỗ cần sử dụng dữ liệu trong database
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        FirebaseFirestore database = getDatabase();
         // accessing array of key "users" in the database
-        DocumentReference documentReference =
-                database.collection(Constants.KEY_COLLECTION_USERS).document(
-                        preferenceManager.getString(Constants.KEY_USER_ID)
-                );
+        DocumentReference documentReference = getDocumentReference(database);
+        cleanUserDataAndBackToSignIn(documentReference);
+    }
+
+    private void cleanUserDataAndBackToSignIn(DocumentReference documentReference) {
         HashMap<String, Object> updates = new HashMap<>();
         updates.put(Constants.KEY_FCM_TOKEN, FieldValue.delete());
         documentReference.update(updates)
                 // if delete token function is executed -> the database is updated, then:
                 //      1. Clear the current shared preferences (the preference Manager)
                 //      2. Go back to Sign In screen
-                .addOnSuccessListener(unused -> {
-                    preferenceManager.clear();
-                    startActivity(new Intent(getApplicationContext(), SignInActivity.class));
-                    finish();
-                })
-                .addOnFailureListener(e -> showToast("Unable to sign out"));
+                .addOnSuccessListener(startSignInActivity())
+                .addOnFailureListener(handleException());
+    }
+
+    @NonNull
+    private OnFailureListener handleException() {
+        return e -> showToast("Unable to sign out");
+    }
+
+    @NonNull
+    private OnSuccessListener<Void> startSignInActivity() {
+        return unused -> {
+            preferenceManager.clear();
+            startActivity(new Intent(getApplicationContext(), SignInActivity.class));
+            finish();
+        };
     }
 }

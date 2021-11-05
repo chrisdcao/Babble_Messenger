@@ -1,15 +1,14 @@
 package com.example.babblechatapp.activities;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import android.content.Intent;
 import android.os.Bundle;
-import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.widget.Toast;
 
-import com.example.babblechatapp.R;
 import com.example.babblechatapp.databinding.ActivitySignInBinding;
 import com.example.babblechatapp.utilities.Constants;
 import com.example.babblechatapp.utilities.PreferenceManager;
@@ -40,16 +39,25 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     private void setListeners() {
-        binding.textCreateNewAccount.setOnClickListener(v ->
-                startActivity(new Intent(getApplicationContext(), SignUpActivity.class)));
-        binding.buttonSignIn.setOnClickListener(v -> {
+        binding.textCreateNewAccount.setOnClickListener(startSignUpActivity());
+        binding.buttonSignIn.setOnClickListener(completeSignIn());
+    }
+
+    @NonNull
+    private View.OnClickListener startSignUpActivity() {
+        return v -> startActivity(new Intent(getApplicationContext(), SignUpActivity.class));
+    }
+
+    @NonNull
+    private View.OnClickListener completeSignIn() {
+        return v -> {
             if (isValidSignInDetails()) signIn();
-        });
+        };
     }
 
     private void signIn() {
         loading(true);
-        FirebaseFirestore database = FirebaseFirestore.getInstance();
+        FirebaseFirestore database = getDatabase();
         database.collection(Constants.KEY_COLLECTION_USERS)
                 // from the input email and password, we search in the database matching result
                 .whereEqualTo(Constants.KEY_EMAIL, binding.inputEmail.getText().toString())
@@ -61,19 +69,36 @@ public class SignInActivity extends AppCompatActivity {
                 // using preference manager is a good way to send data across different class (similar to storing database locally into XML for sharing between classes. instead of other types of database)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
-                        DocumentSnapshot documentSnapshot = task.getResult().getDocuments().get(0);
-                        preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
-                        preferenceManager.putString(Constants.KEY_USER_ID, documentSnapshot.getId());
-                        preferenceManager.putString(Constants.KEY_NAME, documentSnapshot.getString(Constants.KEY_NAME));
-                        preferenceManager.putString(Constants.KEY_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
-                        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        startActivity(intent);
+                        DocumentSnapshot documentSnapshot = getDocumentSnapshot(task);
+                        addUserToSharedPreferences(documentSnapshot);
+                        startMainActivity();
                     } else {
                         loading(false);
                         showToast("Unable to sign in");
                     }
                 });
+    }
+
+    @NonNull
+    private FirebaseFirestore getDatabase() {
+        return FirebaseFirestore.getInstance();
+    }
+
+    private void startMainActivity() {
+        Intent intent = new Intent(getApplicationContext(), MainActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        startActivity(intent);
+    }
+
+    private DocumentSnapshot getDocumentSnapshot(com.google.android.gms.tasks.Task<com.google.firebase.firestore.QuerySnapshot> task) {
+        return task.getResult().getDocuments().get(0);
+    }
+
+    private void addUserToSharedPreferences(DocumentSnapshot documentSnapshot) {
+        preferenceManager.putBoolean(Constants.KEY_IS_SIGNED_IN, true);
+        preferenceManager.putString(Constants.KEY_USER_ID, documentSnapshot.getId());
+        preferenceManager.putString(Constants.KEY_NAME, documentSnapshot.getString(Constants.KEY_NAME));
+        preferenceManager.putString(Constants.KEY_IMAGE, documentSnapshot.getString(Constants.KEY_IMAGE));
     }
 
     private void loading(Boolean isLoading) {

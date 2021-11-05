@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="DesignSurface">
+    <option name="filePathToZoomLevelMap">
+      <map>
+        <entry key="..\:/Babble Chat App/app/src/main/res/drawable/background_icon.xml" value="0.3921875" />
+        <entry key="..\:/Babble Chat App/app/src/main/res/layout/activity_main.xml" value="0.33" />
+        <entry key="..\:/Babble Chat App/app/src/main/res/layout/activity_sign_in.xml" value="0.2953703703703704" />
+        <entry key="..\:/Babble Chat App/app/src/main/res/layout/activity_sign_up.xml" value="0.209375" />
+        <entry key="..\:/Babble_Chat_App/app/src/main/res/drawable/background_content_bottom.xml" value="0.3921875" />
+        <entry key="..\:/Babble_Chat_App/app/src/main/res/drawable/ic_back.xml" value="0.3921875" />
+        <entry key="..\:/Babble_Chat_App/app/src/main/res/layout/activity_main.xml" value="0.25" />
+        <entry key="..\:/Babble_Chat_App/app/src/main/res/layout/activity_users.xml" value="0.37604166666666666" />
+        <entry key="..\:/Babble_Chat_App/app/src/main/res/layout/item_container_user.xml" value="0.37604166666666666" />
+        <entry key="..\:/MyApplication/app/src/main/res/drawable/background_image.xml" value="0.3854166666666667" />
+        <entry key="..\:/MyApplication/app/src/main/res/drawable/background_input.xml" value="0.3854166666666667" />
+        <entry key="..\:/MyApplication/app/src/main/res/layout/activity_main.xml" value="0.3541666666666667" />
+        <entry key="..\:/MyApplication/app/src/main/res/layout/activity_sign_in.xml" value="0.3692708333333333" />
+        <entry key="..\:/MyApplication/app/src/main/res/layout/activity_sign_up.xml" value="0.35520833333333335" />
+        <entry key="..\:/MyApplication/app/src/main/res/layout/content_sign_up.xml" value="0.3692708333333333" />
+        <entry key="..\:/Users/User/Desktop/BabbleChat/Babble_Chat_App/app/src/main/res/drawable/background_content_bottom.xml" value="0.3921875" />
+        <entry key="..\:/Users/User/Desktop/BabbleChat/Babble_Chat_App/app/src/main/res/drawable/ic_add.xml" value="0.3921875" />
+        <entry key="..\:/Users/User/Desktop/BabbleChat/Babble_Chat_App/app/src/main/res/layout/activity_main.xml" value="0.37604166666666666" />
+        <entry key="..\:/Users/User/Desktop/BabbleChat/Babble_Chat_App/app/src/main/res/layout/activity_users.xml" value="0.37604166666666666" />
+      </map>
+    </option>
+  </component>
+  <component name="ProjectRootManager" version="2" languageLevel="JDK_11" default="true" project-jdk-name="Android Studio default JDK" project-jdk-type="JavaSDK">
+    <output url="file://$PROJECT_DIR$/../Babble Chat App/build/classes" />
+  </component>
+  <component name="ProjectType">
+    <option name="id" value="Android" />
+  </component>
+</project>
