@@ -4,11 +4,11 @@
 
 Where you babble about almost everything!
 
-# Demo Sign In 🎥
+# Sign In Demo 🎥
 ![Sign In](demo/signin.gif)
 
-# Demo Chat 🎥
+# Chat Demo 🎥
 ![Chat](demo/chat.gif)
 
-# Demo Sign Out 🎥
+# Sign Out Demo 🎥
 ![Sign Out](demo/signout.gif)
