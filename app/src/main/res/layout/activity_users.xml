@@ -42,12 +42,13 @@
         app:layout_constraintTop_toBottomOf="@id/imageBack">
 
         <androidx.recyclerview.widget.RecyclerView
+            android:id="@+id/usersRecyclerView"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:clipToPadding="false"
             android:orientation="vertical"
             android:overScrollMode="never"
-            android:padding="@dimen/_20sdp"
+            android:padding="@dimen/_12sdp"
             android:visibility="gone"
             app:layoutManager="androidx.recyclerview.widget.LinearLayoutManager"/>
 

@@ -21,4 +21,6 @@
     <string name="confirm_your_password">Confirm Your Password</string>
     <string name="back_to_login">Back To Login</string>
     <string name="select_user">Select User</string>
+    <string name="description_send_message">Send Message</string>
+    <string name="type_a_message">Type a message</string>
 </resources>

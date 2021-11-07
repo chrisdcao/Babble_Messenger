@@ -8,9 +8,11 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.util.Base64;
+import android.view.View;
 import android.widget.Toast;
 
 import com.example.babblechatapp.databinding.ActivityMainBinding;
+import com.example.babblechatapp.models.User;
 import com.example.babblechatapp.utilities.Constants;
 import com.example.babblechatapp.utilities.PreferenceManager;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -47,6 +49,12 @@ public class MainActivity extends AppCompatActivity {
 
     private void setListeners() {
         binding.imageSignOut.setOnClickListener(v -> signOut());
+        binding.fabNewChat.setOnClickListener(startUsersActivity());
+    }
+
+    @NonNull
+    private View.OnClickListener startUsersActivity() {
+        return v -> startActivity(new Intent(getApplicationContext(), UsersActivity.class));
     }
 
     /**

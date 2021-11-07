@@ -1,7 +1,6 @@
 package com.example.babblechatapp.activities;
 
 import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContract;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -47,7 +46,7 @@ public class SignUpActivity extends AppCompatActivity {
      */
     private void setListeners() {
         binding.textBackToLogin.setOnClickListener(startSignInActivity());
-        binding.buttonSignUp.setOnClickListener(completeSignUp());
+        binding.buttonSignUp.setOnClickListener(signUp());
         binding.layoutImage.setOnClickListener(addImage());
     }
 
@@ -60,10 +59,10 @@ public class SignUpActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private View.OnClickListener completeSignUp() {
+    private View.OnClickListener signUp() {
         return v -> { // only if the input is valid do we register the information into db (call the signUp())
             if (isValidSignUpDetails())
-                signUp();
+                processSignUp();
         };
     }
 
@@ -75,22 +74,24 @@ public class SignUpActivity extends AppCompatActivity {
     /**
      * Putting the users information input into the database (Firestore)
      */
-    private void signUp() {
+    private void processSignUp() {
         loading(true);
         FirebaseFirestore database = FirebaseFirestore.getInstance();
         HashMap<String, Object> user = createNewUser();
         database.collection(Constants.KEY_COLLECTION_USERS)
                 .add(user)
-                .addOnSuccessListener(documentReference -> {
-                    loading(false);
-                    showToast("Sign Up Successfully!");
-                    addUserToSharedPreferences(documentReference);
-                    startMainActivity();
-                })
+                .addOnSuccessListener(this::completeSignUp)
                 .addOnFailureListener(exception -> {
                     loading(false);
                     showToast(exception.getMessage());
                 });
+    }
+
+    private void completeSignUp(com.google.firebase.firestore.DocumentReference documentReference) {
+        loading(false);
+        showToast("Sign Up Successfully!");
+        addUserToSharedPreferences(documentReference);
+        startMainActivity();
     }
 
     @NonNull

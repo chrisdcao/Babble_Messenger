@@ -12,11 +12,10 @@ import android.widget.Toast;
 import com.example.babblechatapp.databinding.ActivitySignInBinding;
 import com.example.babblechatapp.utilities.Constants;
 import com.example.babblechatapp.utilities.PreferenceManager;
+import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-
-import java.util.HashMap;
-import java.util.regex.Pattern;
+import com.google.firebase.firestore.QuerySnapshot;
 
 public class SignInActivity extends AppCompatActivity {
 
@@ -40,7 +39,7 @@ public class SignInActivity extends AppCompatActivity {
 
     private void setListeners() {
         binding.textCreateNewAccount.setOnClickListener(startSignUpActivity());
-        binding.buttonSignIn.setOnClickListener(completeSignIn());
+        binding.buttonSignIn.setOnClickListener(signIn());
     }
 
     @NonNull
@@ -49,13 +48,13 @@ public class SignInActivity extends AppCompatActivity {
     }
 
     @NonNull
-    private View.OnClickListener completeSignIn() {
+    private View.OnClickListener signIn() {
         return v -> {
-            if (isValidSignInDetails()) signIn();
+            if (isValidSignInDetails()) processSignIn();
         };
     }
 
-    private void signIn() {
+    private void processSignIn() {
         loading(true);
         FirebaseFirestore database = getDatabase();
         database.collection(Constants.KEY_COLLECTION_USERS)
@@ -67,16 +66,21 @@ public class SignInActivity extends AppCompatActivity {
                 // at the end of listening event, put all the account information/settings into the preference manager
                 // this preference manager will be shared through an XML, and MainActivity will from there extract information from it to display
                 // using preference manager is a good way to send data across different class (similar to storing database locally into XML for sharing between classes. instead of other types of database)
-                .addOnCompleteListener(task -> {
-                    if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
-                        DocumentSnapshot documentSnapshot = getDocumentSnapshot(task);
-                        addUserToSharedPreferences(documentSnapshot);
-                        startMainActivity();
-                    } else {
-                        loading(false);
-                        showToast("Unable to sign in");
-                    }
-                });
+                .addOnCompleteListener(completeSignIn());
+    }
+
+    @NonNull
+    private OnCompleteListener<QuerySnapshot> completeSignIn() {
+        return task -> {
+            if (task.isSuccessful() && task.getResult() != null && task.getResult().getDocuments().size() > 0) {
+                DocumentSnapshot documentSnapshot = getDocumentSnapshot(task);
+                addUserToSharedPreferences(documentSnapshot);
+                startMainActivity();
+            } else {
+                loading(false);
+                showToast("Unable to sign in");
+            }
+        };
     }
 
     @NonNull
