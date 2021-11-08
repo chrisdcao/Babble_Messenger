@@ -1,6 +1,5 @@
 # Babble Messenger 💬
-![Babble_Chat_iOS](Logo/babble_icon.png)
-![Babble_Chat_Android](Logo/babble_icon_2.png)
+![Babble_Chat_Android](Logo/babble_icon-18.png)
 
 Where you babble about almost everything!
 
