@@ -1,4 +1,4 @@
-# Babble Chat App 💬
+# Babble Messenger 💬
 ![Babble_Chat_iOS](Logo/babble_icon.png)
 ![Babble_Chat_Android](Logo/babble_icon_2.png)
 
